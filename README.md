@@ -1,115 +1,183 @@
 # Projects Dashboard
 
-A simple bash script that generates an HTML dashboard to track your coding projects. Works with git repositories and regular folders.
+A bash script that generates an interactive HTML dashboard to track your coding projects. Works with git repositories and regular folders.
 
-## How It Works
+## What It Does
 
-```mermaid
-flowchart TB
-    subgraph Input
-        A[Workspace Directory] --> B[Scan Subdirectories]
-    end
+Scans a workspace directory, detects project types, and generates an HTML dashboard showing:
+- Project activity status (active, recent, idle, dormant)
+- Git status (uncommitted files, sync state)
+- Auto-detected tech stack
+- Custom categories and descriptions you assign
 
-    subgraph Detection
-        B --> C{Is Git Repo?}
-        C -->|Yes| D[Git Analysis]
-        C -->|No| E[File Analysis]
+## Quick Start
 
-        D --> D1[Last Commit Date]
-        D --> D2[Uncommitted Files]
-        D --> D3[Remote Sync Status]
+```bash
+# 1. Install dependencies
+brew install jq          # macOS
+sudo apt install jq      # Debian/Ubuntu
+# curl is usually pre-installed; if not: brew install curl / sudo apt install curl
 
-        E --> E1[Last Modified Date]
-        E --> E2[File Count]
-    end
+# 2. Clone and install
+git clone <repo-url>
+cd projects-dashboard
+./projects-dashboard.sh --install ~/your-projects-directory
 
-    subgraph Classification
-        D1 & E1 --> F[Calculate Days Since Activity]
-        F --> G{Activity Level}
-        G -->|≤7 days| H[Active]
-        G -->|8-30 days| I[Recent]
-        G -->|31-90 days| J[Idle]
-        G -->|>90 days| K[Dormant]
-    end
-
-    subgraph Output
-        H & I & J & K --> L[Generate HTML]
-        D2 & D3 --> M[Generate Alerts]
-        L & M --> N[Open in Browser]
-    end
+# 3. Start a new Claude Code session - dashboard opens automatically
 ```
 
 ## Features
 
-- **Git repos**: Shows last commit, uncommitted files, remote sync status
-- **Regular folders**: Shows last file modification, file count
-- **Auto-detect project type**: Node.js, Python, React, Next.js, Rust, Go, Ruby, Java
-- **Activity sections**: Active, Recent, Idle, Dormant
-- **Alerts**: Uncommitted changes, unpushed commits, missing remotes
-- **Cross-platform**: Works on macOS and Linux
+- **Auto-detection**: Scans filesystem, detects tech stacks (React, Python, Go, etc.)
+- **Git integration**: Uncommitted files, remote sync status, last commit
+- **Activity tracking**: Categorizes by days since last activity
+- **Project registration**: Assign categories and descriptions to track projects
+- **Alerts**: Warns about uncommitted changes, unpushed commits, missing remotes
+- **Cross-platform**: macOS and Linux
 
-## Installation
+## Requirements
 
-```bash
-# Clone the repo
-git clone https://github.com/yourusername/projects-dashboard.git
-
-# Make executable
-chmod +x projects-dashboard/projects-dashboard.sh
-
-# Optional: Add to PATH
-cp projects-dashboard/projects-dashboard.sh /usr/local/bin/projects-dashboard
-```
+- Bash 4.0+
+- [jq](https://stedolan.github.io/jq/) for JSON parsing
+- curl (for GitHub visibility checks)
+- Git (optional, for repository features)
 
 ## Usage
 
 ```bash
-# Scan current directory
+# Run dashboard (uses configured workspace)
 ./projects-dashboard.sh
 
-# Scan specific directory
+# Run for specific directory
 ./projects-dashboard.sh ~/projects
 
-# Scan multiple workspaces (run separately)
-./projects-dashboard.sh ~/work
-./projects-dashboard.sh ~/personal
+# Install as Claude Code session hook
+./projects-dashboard.sh --install ~/workspace
+
+# Remove hook
+./projects-dashboard.sh --uninstall
+
+# Show help
+./projects-dashboard.sh --help
 ```
 
-## Output
+## Understanding the Dashboard
 
-The script generates `/tmp/projects-dashboard.html` and opens it in your default browser.
+### Two Key Concepts
 
-| Column | Git Repo | Regular Folder |
-|--------|----------|----------------|
-| Last Activity | Last commit | Last file modified |
-| Status | Uncommitted file count | - |
-| Remote | Sync status (ahead/behind/synced) | - |
-| Files | File count | File count |
+| Concept | What It Is | Editable? |
+|---------|-----------|-----------|
+| **Tech Stack** | Auto-detected from files (React, Python, etc.) | No - always auto-detected |
+| **Category** | Project purpose you assign (products, infra, fun, etc.) | Yes - you choose |
 
-## Project Type Detection
+### Activity Sections
 
-| Detected Type | Based On |
-|---------------|----------|
+Projects are grouped by how recently they were modified:
+
+| Section | Days Since Last Activity |
+|---------|--------------------------|
+| Active | 0-7 days |
+| Recent | 8-30 days |
+| Idle | 31-90 days |
+| Dormant | >90 days |
+
+### Registered vs Unregistered
+
+- **Unregistered**: New projects the dashboard found but you haven't categorized yet
+- **Registered**: Projects you've assigned a category to - these are tracked in your config
+
+## Registering Projects
+
+When you first run the dashboard, all projects appear as "Unregistered". To organize them:
+
+1. Find the project in the **Unregistered** section
+2. Select a **Category** from the dropdown (products, infra, fun, etc.)
+3. Optionally add a **Description**
+4. Click **Register** (or **Register All** for bulk registration)
+5. Click **Save Config** - downloads a config file to your Downloads folder
+6. **Next dashboard run**: The config is automatically imported
+
+The saved config persists your category and description choices.
+
+## Config File
+
+Project metadata is stored in `<workspace>/.projects-config.json`:
+
+```json
+{
+  "my-project": {
+    "category": "products",
+    "description": "Frontend dashboard app"
+  },
+  "api-server": {
+    "category": "infra",
+    "description": "REST API backend"
+  }
+}
+```
+
+| Field | Purpose |
+|-------|---------|
+| `category` | Project purpose: `infra`, `products`, `fun`, `personal`, `skunkworks`, `other` |
+| `description` | Your notes about the project (shown in dashboard) |
+
+## Tech Stack Detection
+
+The dashboard auto-detects project type from files:
+
+| Detected As | Based On |
+|-------------|----------|
 | Next.js | `next.config.js` or `next.config.mjs` |
 | Vite | `vite.config.js` or `vite.config.ts` |
 | React | `react` in package.json |
 | Vue | `vue` in package.json |
-| Node.js | `package.json` |
+| Node.js | `package.json` (no framework detected) |
 | Python | `requirements.txt`, `pyproject.toml`, or `setup.py` |
 | Rust | `Cargo.toml` |
 | Go | `go.mod` |
 | Ruby | `Gemfile` |
 | Java | `pom.xml` or `build.gradle` |
+| Shell | `*.sh` files |
+| Documentation | Only `README.md` or `CLAUDE.md` |
+
+## Dashboard Columns
+
+| Column | Git Repo | Regular Folder |
+|--------|----------|----------------|
+| Tech Stack | Auto-detected | Auto-detected |
+| Category | From config | From config |
+| Description | From config (or auto-filled) | From config (or auto-filled) |
+| Last Activity | Time since last commit | Time since last file change |
+| Status | Uncommitted file count | - |
+| Remote | Sync status (ahead/behind/synced) | local-only |
+| Visibility | public/private (GitHub repos) | local-only |
+| Files | File count | File count |
+
+Descriptions are auto-filled from `package.json`, `pyproject.toml`, or `README.md` if not set manually.
 
 ## Excluded Folders
 
-The following are automatically excluded from scans:
+These are automatically skipped during scans:
 
 `node_modules`, `.git`, `.venv`, `venv`, `__pycache__`, `.cache`, `dist`, `build`, `.next`, `.nuxt`, `target`, `vendor`
 
-## Using with Claude Code
+## Installation Details
 
-Add as a session start hook in `~/.claude/settings.json`:
+Running `--install` creates:
+
+| File | Purpose |
+|------|---------|
+| `~/.config/projects-dashboard/config.json` | Stores workspace path and script location |
+| `~/.claude/hooks/project-dashboard.sh` | Hook that runs on Claude Code session start |
+
+To change your workspace later:
+```bash
+./projects-dashboard.sh --install ~/new-workspace
+```
+
+## Manual Claude Code Setup
+
+If you prefer manual setup instead of `--install`, add to `~/.claude/settings.json`:
 
 ```json
 {
@@ -119,7 +187,7 @@ Add as a session start hook in `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "/path/to/projects-dashboard.sh ~/projects"
+            "command": "/path/to/projects-dashboard.sh /path/to/workspace"
           }
         ]
       }
@@ -127,6 +195,10 @@ Add as a session start hook in `~/.claude/settings.json`:
   }
 }
 ```
+
+## Output
+
+Generates `/tmp/projects-dashboard.html` and opens in your default browser.
 
 ## License
 
