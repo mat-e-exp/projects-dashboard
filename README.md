@@ -1,6 +1,8 @@
 # Projects Dashboard
 
-A bash script that generates an interactive HTML dashboard to track your coding projects. Works with git repositories and regular folders.
+I'm working on a number of Claude projects simultaneously and keeping track of status was becoming a bit of an issue, so I created this dashboard to help track everything and keep me honest.
+
+It's a bash script that generates an interactive HTML dashboard to track your coding projects. Works with git repositories and regular folders.
 
 ## What It Does
 
