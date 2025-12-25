@@ -810,15 +810,15 @@ run_dashboard() {
         .alerts li::before { content: "⚠ "; }
         .summary {
             display: flex;
-            gap: 30px;
+            gap: 40px;
             justify-content: center;
-            padding: 20px;
+            padding: 25px 30px;
             background: #252540;
             border-radius: 8px;
-            margin-top: 20px;
+            margin-bottom: 30px;
         }
         .summary-item { text-align: center; }
-        .summary-item .num { font-size: 24px; font-weight: 600; }
+        .summary-item .num { font-size: 36px; font-weight: 600; }
         .summary-item .label { font-size: 11px; color: #888; text-transform: uppercase; margin-top: 4px; }
         .summary-item.active .num { color: #4ade80; }
         .summary-item.recent .num { color: #facc15; }
@@ -954,6 +954,21 @@ HTMLHEAD
 </div>
 HEADER
 
+    # Summary (at top, before alerts)
+    total=$((${#ACTIVE_PROJECTS[@]} + ${#RECENT_PROJECTS[@]} + ${#IDLE_PROJECTS[@]} + ${#DORMANT_PROJECTS[@]}))
+    unreg=${#UNREGISTERED_PROJECTS[@]}
+
+    cat >> "$OUTPUT_FILE" << SUMMARY
+<div class="summary">
+    <div class="summary-item unregistered"><div class="num">$unreg</div><div class="label">Unregistered</div></div>
+    <div class="summary-item active"><div class="num">${#ACTIVE_PROJECTS[@]}</div><div class="label">Active</div></div>
+    <div class="summary-item recent"><div class="num">${#RECENT_PROJECTS[@]}</div><div class="label">Recent</div></div>
+    <div class="summary-item idle"><div class="num">${#IDLE_PROJECTS[@]}</div><div class="label">Idle</div></div>
+    <div class="summary-item dormant"><div class="num">${#DORMANT_PROJECTS[@]}</div><div class="label">Dormant</div></div>
+    <div class="summary-item"><div class="num">$((total + unreg))</div><div class="label">Total</div></div>
+</div>
+SUMMARY
+
     # Alerts
     if [ ${#ALERTS[@]} -gt 0 ]; then
         echo "<div class=\"alerts\"><h3>Alerts</h3><ul>" >> "$OUTPUT_FILE"
@@ -1074,21 +1089,6 @@ HEADER
     output_section "recent" "Recent" "Activity 8-30 days" "${RECENT_PROJECTS[@]}"
     output_section "idle" "Idle" "Activity 31-90 days" "${IDLE_PROJECTS[@]}"
     output_section "dormant" "Dormant" "Activity >90 days" "${DORMANT_PROJECTS[@]}"
-
-    # Summary
-    total=$((${#ACTIVE_PROJECTS[@]} + ${#RECENT_PROJECTS[@]} + ${#IDLE_PROJECTS[@]} + ${#DORMANT_PROJECTS[@]}))
-    unreg=${#UNREGISTERED_PROJECTS[@]}
-
-    cat >> "$OUTPUT_FILE" << SUMMARY
-<div class="summary">
-    <div class="summary-item unregistered"><div class="num">$unreg</div><div class="label">Unregistered</div></div>
-    <div class="summary-item active"><div class="num">${#ACTIVE_PROJECTS[@]}</div><div class="label">Active</div></div>
-    <div class="summary-item recent"><div class="num">${#RECENT_PROJECTS[@]}</div><div class="label">Recent</div></div>
-    <div class="summary-item idle"><div class="num">${#IDLE_PROJECTS[@]}</div><div class="label">Idle</div></div>
-    <div class="summary-item dormant"><div class="num">${#DORMANT_PROJECTS[@]}</div><div class="label">Dormant</div></div>
-    <div class="summary-item"><div class="num">$((total + unreg))</div><div class="label">Total</div></div>
-</div>
-SUMMARY
 
     # Embed project data and JavaScript
     cat >> "$OUTPUT_FILE" << JSBLOCK
