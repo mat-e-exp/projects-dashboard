@@ -4,6 +4,8 @@ I'm working on a number of Claude projects simultaneously and keeping track of s
 
 It's a bash script that generates an interactive HTML dashboard to track your coding projects. Works with git repositories and regular folders.
 
+![Projects Dashboard Screenshot](proj-dash-ss.png)
+
 ## What It Does
 
 Scans a workspace directory, detects project types, and generates an HTML dashboard showing:
