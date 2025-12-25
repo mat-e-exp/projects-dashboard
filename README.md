@@ -23,7 +23,7 @@ sudo apt install jq      # Debian/Ubuntu
 # curl is usually pre-installed; if not: brew install curl / sudo apt install curl
 
 # 2. Clone and install
-git clone <repo-url>
+git clone https://github.com/mat-e-exp/projects-dashboard.git
 cd projects-dashboard
 ./projects-dashboard.sh --install ~/your-projects-directory
 

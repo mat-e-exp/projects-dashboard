@@ -7,7 +7,9 @@ Bash script that generates an interactive HTML dashboard for tracking coding pro
 ```
 projects-dashboard/
 ├── projects-dashboard.sh    # Main script (all-in-one)
-└── README.md                # User documentation
+├── proj-dash-ss.png         # Screenshot for README
+├── README.md                # User documentation
+└── CLAUDE.md                # Developer documentation
 ```
 
 ## Key Files & Locations
@@ -93,6 +95,7 @@ The script generates a self-contained HTML file with:
 | Last Activity | Git/file mtime | No |
 | Status | Git status | No |
 | Remote | Git remote | No |
+| Visibility | GitHub API (public/private) | No |
 | Files | File count | No |
 
 ## Config JSON Format
