@@ -6,6 +6,10 @@ It's a bash script that generates an interactive HTML dashboard to track your co
 
 ![Projects Dashboard Screenshot](proj-dash-ss.png)
 
+## How I Use It
+
+I run this as a hook at startup. What this does is scan everything and then launch my dashboard as a local (temporary) HTML page, which I use to give myself context. It's not only Claude that needs a jumpstart. This results in a slight delay when launching Claude as it does all its scanning.
+
 ## What It Does
 
 Scans a workspace directory, detects project types, and generates an HTML dashboard showing:
