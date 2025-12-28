@@ -8,7 +8,12 @@ It's a bash script that generates an interactive HTML dashboard to track your co
 
 ## How I Use It
 
-I run this as a hook at startup. What this does is scan everything and then launch my dashboard as a local (temporary) HTML page, which I use to give myself context. It's not only Claude that needs a jumpstart. This results in a slight delay when launching Claude as it does all its scanning.
+I run this as a Claude Code startup hook to give myself context before diving into work. It's not only Claude that needs a jumpstart.
+
+- Runs as a hook at startup (`SessionStart` hook in `~/.claude/hooks/`)
+- Scans everything (loops through all subdirectories, runs git commands, etc.)
+- Launches as local temporary HTML (`/tmp/projects-dashboard.html`)
+- Causes slight delay (scanning is synchronous before Claude session starts)
 
 ## What It Does
 
