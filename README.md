@@ -204,6 +204,45 @@ If you prefer manual setup instead of `--install`, add to `~/.claude/settings.js
 
 Generates `/tmp/projects-dashboard.html` and opens in your default browser.
 
+## Production Values
+
+This has been created to fix a today problem, and assist with some structure and personal context around the projects I'm working on. Not really for production right now, as there are a number of issues to fix:
+
+### Code Quality
+
+| Area | Status |
+|------|--------|
+| **Single file** | All 1300 lines in one script - simple to deploy, harder to maintain |
+| **Mixed languages** | Bash, HTML, CSS, JS interleaved via heredocs - no syntax highlighting/linting |
+| **Duplication** | `find` exclusion patterns repeated 3 times |
+| **HTML generation** | String concatenation - fragile, special characters could break output |
+| **Hardcoded values** | Activity thresholds, skip folders, categories all baked in |
+
+### Scalability
+
+| Operation | Per Project | Issue |
+|-----------|-------------|-------|
+| Git commands | ~30ms | Fine |
+| File scanning | ~50ms | Capped at 100 files |
+| GitHub API | **200-500ms** | One HTTP request per repo |
+| `file_count` | ~100ms | No file limit (unlike other scans) |
+
+### When It Hurts
+
+**~50-60 projects**: GitHub API rate limit (60 requests/hour unauthenticated) becomes the bottleneck. Dashboard generation slows to 30+ seconds.
+
+**100+ projects**: Rate-limited before finishing. Would need to cache visibility in config and refresh on demand.
+
+### What Would Need Fixing
+
+| Problem | Solution |
+|---------|----------|
+| API rate limit | Cache `visibility` in `.projects-config.json` |
+| Slow startup | Parallel operations, background refresh |
+| `file_count` slow | Add 100-file limit like other scans |
+| Too many rows | Category filtering, collapse dormant by default |
+| No search | Add filter/search in UI |
+
 ## License
 
 MIT
